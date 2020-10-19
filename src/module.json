@@ -3,7 +3,7 @@
 	"title": "Camera Follow Token",
 	"description": "Adds a checkbox to the Token configuration window which sets the camera to follow that token.",
 	"author": "edzillion",
-	"systems": ["any"],
+	"systems": ["dnd5e"],
 	"version": "0.1.0",
 	"minimumCoreVersion": "0.0.1",
   "esmodules": [

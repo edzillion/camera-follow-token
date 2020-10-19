@@ -40,12 +40,11 @@ Hooks.on('updateToken', function (_scene, token) {
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
 		y:token.y + (token.height * canvas.grid.size)/2,
-		scale: canvas.scene._viewPosition.scale,
-		duration: 0,
+		scale: canvas.scene._viewPosition.scale
 	}
 	log(LogLevel.DEBUG, 'updateToken, data', data);
 	log(LogLevel.DEBUG, 'panning to (x,y)', data.x, data.y);
-	canvas.animatePan(data)
+
 });
 
 Hooks.on('renderTokenConfig', function (tokenConfig:TokenConfig, html:JQuery) {
