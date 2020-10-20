@@ -1,4 +1,4 @@
-import { MODULE_ID } from '../constants';
+const MODULE_ID = 'camera-follow-token';
 
 /**
  * Logging
