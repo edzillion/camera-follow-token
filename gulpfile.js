@@ -436,8 +436,8 @@ function updateManifest(cb) {
 		manifest.file.version = targetVersion;
 
 		/* Update URLs */
-
-		const result = `${rawURL}/v${manifest.file.version}/package/${manifest.file.name}-v${manifest.file.version}.zip`;
+		https://github.com/edzillion/camera-follow-token/releases/download/0.1.1/camera-follow-token-v0.1.1.zip
+		const result = `${rawURL}/releases/download/${manifest.file.version}/${manifest.file.name}-v${manifest.file.version}.zip`;
 
 		manifest.file.url = repoURL;
 		manifest.file.manifest = `${rawURL}/master/${manifestRoot}/${manifest.name}`;
