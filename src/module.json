@@ -11,5 +11,5 @@
 	],
 	"url": "https://github.com/edzillion/camera-follow-token",
 	"manifest": "https://raw.githubusercontent.com/edzillion/camera-follow-token/master/src/module.json",
-	"download": "https://raw.githubusercontent.com/edzillion/camera-follow-token/v0.1.1/package/camera-follow-token-v0.1.1.zip"
+	"download": "https://github.com/edzillion/camera-follow-token/releases/download/0.1.1/camera-follow-token-v0.1.1.zip"
 }
