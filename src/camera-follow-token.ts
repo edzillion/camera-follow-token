@@ -14,7 +14,8 @@ import { log, LogLevel } from './module/logging';
 
 let followingToken: Token;
 
-CONFIG.cftLogLevel = 2;
+CONFIG.cftLogLevel = 1;
+// CONFIG.debug.hooks = true;
 /* ------------------------------------ */
 /* Initialize module					*/
 /* ------------------------------------ */
@@ -45,9 +46,17 @@ Hooks.on('updateToken', function (_scene, token) {
 	log(LogLevel.DEBUG, 'updateToken, data', data);
 	log(LogLevel.DEBUG, 'panning to (x,y)', data.x, data.y);
 
+	// Update the scene tracked position
+	canvas.stage.pivot.set(data.x, data.y);
+	canvas.scene._viewPosition = data;
+	// Call canvasPan Hook
+	Hooks.callAll("canvasPan", canvas, data);
+	
+	// Align the HUD
+	canvas.hud.align();
 });
 
-Hooks.on('renderTokenConfig', function (tokenConfig:TokenConfig, html:JQuery) {
+Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQuery) {
 	log(LogLevel.INFO, 'renderTokenConfig');
 	// @ts-ignore
 	let checked = (tokenConfig.token.id === followingToken?.id) ? 'checked' : '';
@@ -71,4 +80,5 @@ Hooks.on('renderTokenConfig', function (tokenConfig:TokenConfig, html:JQuery) {
 			followingToken = tokenConfig.token;
 		}
 	});
+	tokenConfig.setPosition({height: "auto"});
 });
