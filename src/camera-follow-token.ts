@@ -1,6 +1,6 @@
 /**
  * Camera Follow Token - a simple module for FoundryVTT that locks the camera position on a token.
- * All functionality is wrapped in it's main Class `BloodNGuts`.
+ * Functions entirely through Hook on `updateToken` and `renderTokenConfig`.
  * @license [GNU GPLv3.0 & 'Commons Clause' License Condition v1.0]{@link https://github.com/edzillion/camera-follow-token/blob/master/LICENSE.md}
  * @packageDocumentation
  * @author [edzillion]{@link https://github.com/edzillion}
@@ -8,9 +8,9 @@
 
 import { log, LogLevel } from './module/logging';
 
-let followingToken: Token;
+let followingTokenId: string;
 
-CONFIG.cftLogLevel = 0;
+CONFIG.cft = { logLevel: 0 };
 // CONFIG.debug.hooks = true;
 
 Hooks.once('init', async function() {
@@ -19,7 +19,7 @@ Hooks.once('init', async function() {
 
 Hooks.on('updateToken', function (_scene, token) {
 	log(LogLevel.INFO, 'updateToken');
-	if (!followingToken || token._id !== followingToken.id) return;
+	if (!followingTokenId || token._id !== followingTokenId) return;
 	
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
@@ -42,7 +42,7 @@ Hooks.on('updateToken', function (_scene, token) {
 Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQuery) {
 	log(LogLevel.INFO, 'renderTokenConfig');
 	// @ts-ignore
-	let checked = (tokenConfig.token.id === followingToken?.id) ? 'checked' : '';
+	let checked = (followingTokenId && (tokenConfig.token.id === followingTokenId)) ? 'checked' : '';
 	let d = document.createElement('div');
 	d.className = 'form-group';
 	d.innerHTML = `<label>Lock Camera on this Token:</label>
@@ -54,13 +54,13 @@ Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQue
 		if (checked) {
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'stop cam follow');
-			followingToken = null;
+			followingTokenId = undefined;
 		}
 		else {
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'cam follow');
 			// @ts-ignore
-			followingToken = tokenConfig.token;
+			followingTokenId = tokenConfig.token.id;
 		}
 	});
 	//recalculate the height now that we've added elements
