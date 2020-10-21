@@ -1,6 +1,6 @@
 /**
  * Camera Follow Token - a simple module for FoundryVTT that locks the camera position on a token.
- * All functionality is wrapped in it's main Class `BloodNGuts`.
+ * Functions entirely through Hook on `updateToken` and `renderTokenConfig`.
  * @license [GNU GPLv3.0 & 'Commons Clause' License Condition v1.0]{@link https://github.com/edzillion/camera-follow-token/blob/master/LICENSE.md}
  * @packageDocumentation
  * @author [edzillion]{@link https://github.com/edzillion}
