@@ -10,7 +10,7 @@ import { log, LogLevel } from './module/logging';
 
 let followingToken: Token;
 
-CONFIG.cftLogLevel = 0;
+CONFIG.cft = { logLevel: 0 };
 // CONFIG.debug.hooks = true;
 
 Hooks.once('init', async function() {
