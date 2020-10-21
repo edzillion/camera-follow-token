@@ -8,7 +8,7 @@
 
 import { log, LogLevel } from './module/logging';
 
-let followingToken: Token;
+let followingTokenId: string;
 
 CONFIG.cft = { logLevel: 0 };
 // CONFIG.debug.hooks = true;
@@ -19,7 +19,7 @@ Hooks.once('init', async function() {
 
 Hooks.on('updateToken', function (_scene, token) {
 	log(LogLevel.INFO, 'updateToken');
-	if (!followingToken || token._id !== followingToken.id) return;
+	if (!followingTokenId || token._id !== followingTokenId) return;
 	
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
@@ -42,7 +42,7 @@ Hooks.on('updateToken', function (_scene, token) {
 Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQuery) {
 	log(LogLevel.INFO, 'renderTokenConfig');
 	// @ts-ignore
-	let checked = (tokenConfig.token.id === followingToken?.id) ? 'checked' : '';
+	let checked = (followingTokenId && (tokenConfig.token.id === followingTokenId)) ? 'checked' : '';
 	let d = document.createElement('div');
 	d.className = 'form-group';
 	d.innerHTML = `<label>Lock Camera on this Token:</label>
@@ -54,13 +54,13 @@ Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQue
 		if (checked) {
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'stop cam follow');
-			followingToken = null;
+			followingTokenId = undefined;
 		}
 		else {
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'cam follow');
 			// @ts-ignore
-			followingToken = tokenConfig.token;
+			followingTokenId = tokenConfig.token.id;
 		}
 	});
 	//recalculate the height now that we've added elements
