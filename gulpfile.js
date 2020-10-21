@@ -435,9 +435,8 @@ function updateManifest(cb) {
 		packageJson.version = targetVersion;
 		manifest.file.version = targetVersion;
 
-		/* Update URLs */
-		https://github.com/edzillion/camera-follow-token/releases/download/0.1.1/camera-follow-token-v0.1.1.zip
-		const result = `${rawURL}/releases/download/${manifest.file.version}/${manifest.file.name}-v${manifest.file.version}.zip`;
+		/* Update URLs */	
+		const result = `${repoURL}/releases/download/v${manifest.file.version}/${manifest.file.name}-v${manifest.file.version}.zip`;
 
 		manifest.file.url = repoURL;
 		manifest.file.manifest = `${rawURL}/master/${manifestRoot}/${manifest.name}`;
@@ -500,5 +499,5 @@ exports.publish = gulp.series(
 	updateManifest,
 	execBuild,
 	packageBuild,
-	execGit
+	//execGit
 );
