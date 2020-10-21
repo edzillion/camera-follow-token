@@ -8,6 +8,9 @@
 
 import { log, LogLevel } from './module/logging';
 
+const MODULE_ID = 'camera-follow-token'
+
+let gmFollowingTokenId: string;
 let followingTokenId: string;
 
 CONFIG.cft = { logLevel: 0 };
@@ -17,9 +20,13 @@ Hooks.once('init', async function() {
 	log(LogLevel.INFO, 'Initializing ...');
 });
 
-Hooks.on('updateToken', function (_scene, token) {
-	log(LogLevel.INFO, 'updateToken');
-	if (!followingTokenId || token._id !== followingTokenId) return;
+Hooks.on('updateToken', function (_scene, token) {	
+	const tokenId = token.id || token._id;
+	gmFollowingTokenId = canvas.scene.getFlag(MODULE_ID, 'gmFollowingTokenId');
+	log(LogLevel.INFO, 'updateToken', token, followingTokenId, gmFollowingTokenId);
+	
+	if (followingTokenId !== tokenId && gmFollowingTokenId !== tokenId) return;
+	if ((gmFollowingTokenId !== followingTokenId) && (gmFollowingTokenId && followingTokenId === tokenId)) return;
 	
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
@@ -43,26 +50,60 @@ Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQue
 	log(LogLevel.INFO, 'renderTokenConfig');
 	// @ts-ignore
 	let checked = (followingTokenId && (tokenConfig.token.id === followingTokenId)) ? 'checked' : '';
+	// @ts-ignore
+	let gmFollowChecked = (gmFollowingTokenId && (tokenConfig.token.id === gmFollowingTokenId)) ? 'checked' : '';
 	let d = document.createElement('div');
 	d.className = 'form-group';
 	d.innerHTML = `<label>Lock Camera on this Token:</label>
 	<input type="checkbox" class="lockCamera" name="lockCamera" data-dtype="Boolean" ${checked} />`;
 	let f = html.find(`.tab[data-tab='character']`)
 	f.append(d);
+	
+	if (game.user.isGM) {
+		let d2 = document.createElement('div');
+		const isDisabled = (checked != 'checked') ? true : false;		
+		log(LogLevel.DEBUG, 'renderTokenConfig isDisabled', isDisabled);
+		d2.className = 'form-group';
+		d2.innerHTML = `<label>[GM Only] Lock all players on this token:</label>
+		<input type="checkbox" class="gmLockCamera" name="gmLockCamera" data-dtype="Boolean" ${gmFollowChecked} disabled=${isDisabled}/>`;
+		f.append(d2);
+	}	
 
-	html.find('.lockCamera').on('change', (event) => {
+	html.find('.lockCamera').on('change', () => {
 		if (checked) {
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'stop cam follow');
-			followingTokenId = undefined;
+			followingTokenId = '';
+			canvas.scene.setFlag(MODULE_ID, 'gmFollowingTokenId', null);			
+			if (game.user.isGM)
+				html.find('.gmLockCamera').prop('disabled', true);
+			checked = '';
 		}
 		else {
 			// @ts-ignore
-			log(LogLevel.DEBUG, tokenConfig.token.name, 'cam follow');
+			log(LogLevel.DEBUG, tokenConfig.token.name, 'cam follow');			
 			// @ts-ignore
 			followingTokenId = tokenConfig.token.id;
+			if (game.user.isGM)
+				html.find('.gmLockCamera').prop('disabled', false);
+			checked = 'checked';
+		}
+	});
+	html.find('.gmLockCamera').on('change', () => {
+		if (gmFollowChecked) {
+			// @ts-ignore
+			log(LogLevel.DEBUG, tokenConfig.token.name, 'stop cam follow GM');
+			canvas.scene.setFlag(MODULE_ID, 'gmFollowingTokenId', null); 
+			gmFollowChecked = '';
+		}
+		else {
+			// @ts-ignore
+			log(LogLevel.DEBUG, tokenConfig.token.name, 'cam follow GM');
+			// @ts-ignore
+			canvas.scene.setFlag(MODULE_ID, 'gmFollowingTokenId', tokenConfig.token.id);
+			gmFollowChecked = 'checked';
 		}
 	});
 	//recalculate the height now that we've added elements
-	tokenConfig.setPosition({height: "auto"});
+	tokenConfig.setPosition({ height: "auto" });
 });
