@@ -30,7 +30,7 @@ Hooks.on('updateToken', function (_scene, token) {
 	let tempFollowingTokenId = (gmFollowingTokenId !== null) ? gmFollowingTokenId : followingTokenId;
 	if (tempFollowingTokenId !== tokenId) return;
 
-	log(LogLevel.INFO, 'updateToken focus on', token.data.name);
+	log(LogLevel.INFO, 'updateToken focus on', token.name);
 	
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
