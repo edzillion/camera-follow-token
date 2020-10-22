@@ -23,10 +23,14 @@ Hooks.once('init', async function() {
 Hooks.on('updateToken', function (_scene, token) {	
 	const tokenId = token.id || token._id;
 	gmFollowingTokenId = canvas.scene.getFlag(MODULE_ID, 'gmFollowingTokenId');
-	log(LogLevel.INFO, 'updateToken', token, followingTokenId, gmFollowingTokenId);
 	
+
+	// todo: simplify this logic
 	if (followingTokenId !== tokenId && gmFollowingTokenId !== tokenId) return;
-	if ((gmFollowingTokenId !== followingTokenId) && (gmFollowingTokenId && followingTokenId === tokenId)) return;
+	let tempFollowingTokenId = (gmFollowingTokenId !== null) ? gmFollowingTokenId : followingTokenId;
+	if (tempFollowingTokenId !== tokenId) return;
+
+	log(LogLevel.INFO, 'updateToken focus on', token.name);
 	
 	let data = {
 		x:token.x + (token.width * canvas.grid.size)/2,
@@ -61,11 +65,10 @@ Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQue
 	
 	if (game.user.isGM) {
 		let d2 = document.createElement('div');
-		const isDisabled = (checked != 'checked') ? true : false;		
-		log(LogLevel.DEBUG, 'renderTokenConfig isDisabled', isDisabled);
+		const isDisabled = (checked != 'checked') ? 'disabled' : '';
 		d2.className = 'form-group';
 		d2.innerHTML = `<label>[GM Only] Lock all players on this token:</label>
-		<input type="checkbox" class="gmLockCamera" name="gmLockCamera" data-dtype="Boolean" ${gmFollowChecked} disabled=${isDisabled}/>`;
+		<input type="checkbox" class="gmLockCamera" name="gmLockCamera" data-dtype="Boolean" ${gmFollowChecked} ${isDisabled}/>`;
 		f.append(d2);
 	}	
 
@@ -74,9 +77,11 @@ Hooks.on('renderTokenConfig', async function (tokenConfig:TokenConfig, html:JQue
 			// @ts-ignore
 			log(LogLevel.DEBUG, tokenConfig.token.name, 'stop cam follow');
 			followingTokenId = '';
+			if (game.user.isGM) {
 			canvas.scene.setFlag(MODULE_ID, 'gmFollowingTokenId', null);			
-			if (game.user.isGM)
 				html.find('.gmLockCamera').prop('disabled', true);
+				html.find('.gmLockCamera').prop('checked', false);
+			}
 			checked = '';
 		}
 		else {
